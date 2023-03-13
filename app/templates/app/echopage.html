@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>웹소켓 Echo</title>
+</head>
+<body>
+    <h1 text:center>웹소켓 ...</h1>
+    <script>
+        const ws = new WebSocket("ws://localhost:8000/ws/echo/");
+
+        ws.onopen = () => {
+            console.log("웹소켓 서버와 접속"); // 접속되면 나오는 메시지
+           };
+        ws.onmessage = (event) => {
+            const message = event.data;
+            const obj=JSON.parse(message); // 객체로 들어온 데이터를 직렬화 시킨다.
+            console.log("메세지 수신 :", obj);
+            console.log(obj["content"])
+            console.log(obj["user"])
+        };
+        ws.onerror = () => {
+            console.log("웹소켓 에러 발생");
+        }
+        
+        ws.onclose = (event) => {
+            if(event.wasClean) {
+            console.log("ws.close()에 의한 연결 끊김.")
+        } else {
+        // 서버 프로세스가 죽거나 네트워크 장애
+            console.log("웹소켓 서버와 연결이 죽음.");
+        }
+        }
+
+    </script>
+</body>
+</html>
