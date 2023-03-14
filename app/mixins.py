@@ -23,6 +23,5 @@ class ChannelLayerGroupSendMixin:
 
     def channel_layer_group_send(self, message_dict):
         async_to_sync(self.channel_layer.group_send)(
-            self.CHANNEL_LAYER_GROUP_NAME,
-            message_dict,
+            self.CHANNEL_LAYER_GROUP_NAME, message_dict
         )

@@ -91,7 +91,7 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
+# PORT 값이 거짓일 경우 (빈문자열, 0), 디폴트 포트번호로서 6379를 사용
 # 채널레이어 설정
 if "CHANNEL_LAYER_REDIS_URL" in env:
     channel_layer_redis = env.db_url("CHANNEL_LAYER_REDIS_URL")
@@ -102,13 +102,12 @@ if "CHANNEL_LAYER_REDIS_URL" in env:
                 "hosts": [
                     {
                         "host": channel_layer_redis["HOST"],
-                        "port": channel_layer_redis.get("PORT")
-                        or 6379,  # PORT 값이 거짓일 경우 (빈문자열, 0), 디폴트 포트번호로서 6379를 사용
+                        "port": channel_layer_redis.get("PORT") or 6379,
                         "password": channel_layer_redis["PASSWORD"],
-                    },
-                ],
+                    }
+                ]
             },
-        },
+        }
     }
 
 
