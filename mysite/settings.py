@@ -11,10 +11,17 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+from environ import Env
 
+env = Env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+env_path = BASE_DIR / ".env"
 
+if env_path.exists():
+    with env_path.open(encoding="utf8") as f:
+        # 디폴트 동작으로 동일한 이름의 환경변수가 이미 등록된 경우, 덮어쓰지 않는다.
+        env.read_env(f, overwrite=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -31,15 +38,16 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'app',
-    'channels',
-    'daphne',
+    "channels",
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # myapp
+    "app",
 ]
 
 MIDDLEWARE = [
@@ -82,6 +90,25 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+# 채널레이어 설정
+if "CHANNEL_LAYER_REDIS_URL" in env:
+    channel_layer_redis = env.db_url("CHANNEL_LAYER_REDIS_URL")
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [
+                    {
+                        "host": channel_layer_redis["HOST"],
+                        "port": channel_layer_redis.get("PORT")
+                        or 6379,  # PORT 값이 거짓일 경우 (빈문자열, 0), 디폴트 포트번호로서 6379를 사용
+                        "password": channel_layer_redis["PASSWORD"],
+                    },
+                ],
+            },
+        },
+    }
 
 
 # Password validation
