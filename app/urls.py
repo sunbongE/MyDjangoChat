@@ -1,7 +1,9 @@
-from django.urls import path 
+from django.urls import path
 from app import views
 
-app_name = 'app'
+app_name = "app"
 urlpatterns = [
-    path('echo/',views.echo_page ),
+    path("echo/", views.echo_page),
+    path("liveblog/", views.liveblog_index),
+    path("liveblog/posts/<int:post_id>/", views.post_partial, name="post_partial"),
 ]
