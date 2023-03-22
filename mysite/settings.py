@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "django_bootstrap5",
     # myapp
     "app",
+    "chat",
 ]
 
 MIDDLEWARE = [

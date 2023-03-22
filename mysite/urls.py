@@ -14,9 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path,include
+from django.urls import path, include
+from django.views.generic import RedirectView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('', include('app.urls'))
+    path("chat/", include("chat.urls")),
+    path("", include("app.urls")),
+    # 최상위 주소로 들어오면 chat:index 페이지로 이동하게 만든다.
+    path("", RedirectView.as_view(pattern_name="chat:index"), name="root"),
 ]
