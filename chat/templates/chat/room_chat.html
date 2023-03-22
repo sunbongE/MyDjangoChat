@@ -1,10 +1,83 @@
 {% extends 'chat/base.html' %}
 
+
 {% block content %}
 
-    <h2>채팅방 : {{ room_name }}</h2>
-    {# 웹소켁으로 실시간 채팅 기능 구현하기 #}
-    <hr>
+<div class="container my-5">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card" style='height:600px;'>
+                <div class="card-header">
+                    채팅방 : {{ room_name }}
+                </div>
+                <div class="card-body overflow-hidden">
+                    <div id='chat_messages' class="w-100 h-100 border-0 overflow-scroll">
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <form id='message_form'>
+                        <input type="text" name="message" class="form-control" autofocus autocomplete="off">
+                    </form>
+                </div>
+            </div>
+            <hr class="my-3">
+            <a href="{% url 'chat:index'%}" class="btn btn-primary">대기실로 이동</a>
+        </div>
+    </div>
+</div>
 
-    <a href="{% url 'chat:index' %}">대기실로 이동</a>
+<script>
+    const handlers ={
+        chat_messages_tag:null,
+
+        //초기화
+        init() {
+            this.chat_messages_tag = document.querySelector("#chat_messages");
+            document.querySelector("#message_form").addEventListener("submit", this.onsubmit.bind(this));// 여기 디스가 뭐임??
+            //console.log(this)
+        },
+        // 채팅 메세지 로그 창 끝에 새로운 메세지를 추가
+        append_message(message){
+            const element = document.createElement("div");
+            element.className = "chat-message";//메세지 스타일링 목적
+            // css 스타일링을 위해 div로 감싸줌
+            const wrapper = document.createElement("div");
+            wrapper.textContent = message;
+            element.appendChild(wrapper);
+            
+            this.chat_messages_tag.appendChild(element);
+            this.chat_messages_tag.scrollTop=this.chat_messages_tag.scrollHeight;
+            // scroll to the bottom 새로운 메세지가 오면 자동으로 스크롤이 아래로 이동한다.
+        },
+        onsubmit(event){
+            event.preventDefault();//submit 기본 동작을 무시
+            const form_data = new FormData(event.target);
+            const props = Object.fromEntries(form_data);
+            event.target.reset(); // reset form
+
+            const  {message}  = props;
+            console.log("웹소켓으로 전송할 메세지 :",message);
+            this.append_message(message);
+        },
+    };
+    handlers.init();
+
+</script>
+{% block 'extra_style' %}
+    <style>
+        
+        .chat-message > div {
+            background-color:#3b3b3d;
+            color:#e1e1e1;
+            border-radius: 0.8em;
+            padding:0.4em;
+            margin:0.4em 0;
+            display:inline-block;
+            white-space:pre-wrap;
+            max-width:80%;
+            word-wrap:break-word;
+        }
+
+    </style>
+{% endblock  %}
 {% endblock  %}
