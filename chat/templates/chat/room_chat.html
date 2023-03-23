@@ -1,5 +1,21 @@
 {% extends 'chat/base.html' %}
+{% block extra-style %}
+    <style>
+        
+        .chat-message > div {
+            background-color:#3b3b3d;
+            color:#e1e1e1;
+            border-radius: 0.8em;
+            padding:0.4em;
+            margin:0.4em 0;
+            display:inline-block;
+            white-space:pre-wrap;
+            max-width:80%;
+            word-wrap:break-word;
+        }
 
+    </style>
+{% endblock  %}
 
 {% block content %}
 
@@ -51,11 +67,12 @@
         },
         onsubmit(event){
             event.preventDefault();//submit 기본 동작을 무시
-            const form_data = new FormData(event.target);
-            const props = Object.fromEntries(form_data);
+            const form_data = new FormData(event.target); //데이터를 가져온다.``
+            const props = Object.fromEntries(form_data); // 가져온 데이터를 객체로 변환한다.
             event.target.reset(); // reset form
 
-            const  {message}  = props;
+            const  {message}  = props; // {message:'??'} 객체화 된것의 값을 message에 담았다. 
+            // const message = props.message 와 같다 하지만 위에 방식이 간결하고 유지보수도 쉽다.
             console.log("웹소켓으로 전송할 메세지 :",message);
             this.append_message(message);
         },
@@ -63,21 +80,5 @@
     handlers.init();
 
 </script>
-{% block 'extra_style' %}
-    <style>
-        
-        .chat-message > div {
-            background-color:#3b3b3d;
-            color:#e1e1e1;
-            border-radius: 0.8em;
-            padding:0.4em;
-            margin:0.4em 0;
-            display:inline-block;
-            white-space:pre-wrap;
-            max-width:80%;
-            word-wrap:break-word;
-        }
 
-    </style>
-{% endblock  %}
 {% endblock  %}
