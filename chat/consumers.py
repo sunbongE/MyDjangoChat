@@ -2,6 +2,7 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 from .models import Room
 
+
 class ChatConsumer(JsonWebsocketConsumer):
     # 고정 그룹명을 사용한 코드
     # SQUARE_GROUP_NAME = "square"
@@ -19,7 +20,7 @@ class ChatConsumer(JsonWebsocketConsumer):
         # {'args':(),'kwargs':{'room_name':'test'}} 이다.
         room_pk = self.scope["url_route"]["kwargs"]["room_pk"]
         self.group_name = Room.make_chat_group_name(room_pk=room_pk)
-        self.group_name = f"chat-{room_pk}"
+        # self.group_name = f"chat-{room_pk}"
 
         async_to_sync(self.channel_layer.group_add)(
             self.group_name,

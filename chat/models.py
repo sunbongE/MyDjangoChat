@@ -12,4 +12,4 @@ class Room(models.Model):
 
     @staticmethod
     def make_chat_group_name(room=None, room_pk=None):
-        return "chat-%d" % (room_pk or room.pk)
+        return "chat-%s" % (room_pk or room.pk)
