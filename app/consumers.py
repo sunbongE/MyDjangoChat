@@ -36,5 +36,6 @@ class EchoConsumer(JsonWebsocketConsumer):
                 "message": message,
             }
         )
+        print(message)
         # send api에서는 텍스트 혹은 바이너리 데이터만 전송가능하다.
         # 그래서 객체로 온 데이터를 직렬화해야 한다.
