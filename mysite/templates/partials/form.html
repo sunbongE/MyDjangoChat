@@ -1,0 +1,21 @@
+{% extends 'base.html' %}   
+
+{% block content %}
+<h3>{{form.name}} </h3>
+
+<div class="card">
+    {% if form_name %}
+        <div class="card_header">{{form_name}}</div>
+    {% endif %}
+    <div class="card-body">
+        <form action="" method='post' novalidate>
+            {% csrf_token %}
+            {{bootstrap_form form}}
+            <input type="submit" class='btn btn-primary'
+            {% if submit_label %} value="{{ submit_label }}">
+                {% endif %}
+        </form>
+    </div>
+</div>
+
+{% endblock  %}

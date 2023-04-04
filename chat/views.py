@@ -23,7 +23,15 @@ def room_new(request):
 
 # Create your views here.
 def index(request):
-    return render(request, "chat/index.html")
+    room_qs = Room.objects.all()
+
+    return render(
+        request,
+        "chat/index.html",
+        {
+            "room_list": room_qs,
+        },
+    )
 
 
 def room_chat(request, room_pk):

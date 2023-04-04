@@ -21,6 +21,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("chat/", include("chat.urls")),
     path("", include("app.urls")),
+    path("accounts/", include("accounts.urls")),
     # 최상위 주소로 들어오면 chat:index 페이지로 이동하게 만든다.
     path("", RedirectView.as_view(pattern_name="chat:index"), name="root"),
 ]
