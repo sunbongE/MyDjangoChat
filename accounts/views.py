@@ -12,7 +12,7 @@ signup = CreateView.as_view(
         "form_name": "회원가입",
         "submit_label": "회원가입",
     },
-    success_url=reverse_lazy("accounts:login"),
+    success_url=reverse_lazy("accounts:login"), # 가입 후 로그인페이지로 이동
 )
 
 login = LoginView.as_view(
