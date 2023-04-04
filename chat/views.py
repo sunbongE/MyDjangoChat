@@ -38,11 +38,14 @@ def index(request):
 
 @login_required
 def room_chat(request, room_pk):
+    user = request.user.username
+    print(user)
     room = get_object_or_404(Room, pk=room_pk)
     return render(
         request,
         "chat/room_chat.html",
         {
             "room": room,
+            "user": user,
         },
     )

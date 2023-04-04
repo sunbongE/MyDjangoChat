@@ -13,6 +13,14 @@
     max-width: 80%;
     word-wrap: break-word;
 }
+.chat-message.me{
+    text-align:right;
+}
+.chat-message.me > div {
+    background-color : #1f8cff;
+    color: #fff;
+    text-align: left;
+}
 </style>
 {% endblock %}
 
@@ -97,27 +105,39 @@ const handlers = {
         window.location.href = "{% url 'chat:index' %}";
     },
     onmessage(event) {
-        console.log(event.data)
+        //console.log(event.data)
         const message_json = event.data;
-        console.log("메세지 수신 :", message_json);
+        //console.log("메세지 수신 :", message_json);
 
-        const { type, message } = JSON.parse(message_json);
+        const message_obj = JSON.parse(message_json);
+        const {type}=message_obj;
+        console.log(message_obj)
+
         switch(type) {
             case "chat.message":
-                this.append_message(message);
+                {   
+                    const {message, sender} = message_obj;
+                    this.append_message(message, sender);
+                }
                 break;
             default:
                 console.error(`Invalid message type : ${type}`);
         }
     },
     // 채팅 메세지 로그 창 끝에 새로운 메세지를 추가
-    append_message(message) {
+    append_message(message, sender) {
         const element = document.createElement("div");
         element.className = "chat-message";//메세지 스타일링 목적
             // css 스타일링을 위해 div로 감싸줌
-
+        let footer = "";
+        if (sender === "{{ user }}"){
+            element.className += ' me';
+        }
+        else if (sender){
+            footer = ` from ${sender}`;
+        }
         const wrapper = document.createElement("div");
-        wrapper.textContent = message;
+        wrapper.textContent = message + footer;
         element.appendChild(wrapper);
 
         this.chat_messages_tag.appendChild(element);
