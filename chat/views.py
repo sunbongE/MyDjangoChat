@@ -3,6 +3,28 @@ from chat.forms import RoomForm
 from chat.models import Room
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
+
+@login_required
+def room_delete(request, room_pk):
+    room = get_object_or_404(Room, pk=room_pk)
+
+    if room.owner != request.user:
+        messages.error(request, "채팅방 소유자가 아닙니다.")
+        return redirect("chat:index")
+
+    if request.method == "POST":
+        room.delete()  # db에서 삭제
+        messages.success(request, "채팅방을 삭제했습니다.")
+        return redirect("chat:index")
+    return render(
+        request,
+        "chat/room_confirm_delete.html",
+        {
+            "room": room,
+        },
+    )
 
 
 @login_required
@@ -10,7 +32,9 @@ def room_new(request):
     if request.method == "POST":
         form = RoomForm(request.POST)
         if form.is_valid():
-            created_room: Room = form.save()
+            created_room: Room = form.save(commit=False)
+            created_room.owner = request.user
+            created_room.save()
             return redirect("chat:room_chat", created_room.pk)
     else:
         form = RoomForm()
