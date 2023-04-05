@@ -4,6 +4,18 @@ from chat.models import Room
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import JsonResponse, HttpResponse
+
+
+@login_required
+def room_users(request, room_pk):
+    room = get_object_or_404(Room, pk=room_pk)
+
+    if not room.is_joined_user(request.user):
+        return HttpResponse("Unauthorized user", status=401)
+
+    username_list = room.get_online_usernames()
+    return JsonResponse({"username_list": username_list})
 
 
 @login_required

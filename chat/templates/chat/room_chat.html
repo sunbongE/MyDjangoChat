@@ -29,7 +29,7 @@
 
     <div class="container my-5">
         <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-8">
                 <div class="card" style="height: 600px;">
                     <div class="card-header">
                         채팅방 : {{ room.name }}
@@ -45,18 +45,31 @@
                     </div>
                 </div>
             </div>
+            <div class="col-sm-4">
+                <div class="card" style="height: 600px;">
+                    <div class="card-header">
+                        접속 유저 <span id="user_count"></span>
+                    </div>
+                    <div class="card-body">
+                        <ul id="user_list"></ul>
+                    </div>
+                </div>
+            </div>
 
             <hr class="my-3" />
 
             <a href="{% url 'chat:index' %}" class="btn btn-primary">대기실로 이동</a>
-            {% if room.owner == request.user %}
-            <a href="{% url 'chat:room_delete' room.pk %}" class="btn btn-danger">채팅방 삭제</a>
+
+            {% if request.user == room.owner %}
+                <a href="{% url 'chat:room_delete' room.pk %}" class="btn btn-danger">
+                    채팅방 삭제하기
+                </a>
             {% endif %}
-        
         </div>
     </div>
-    <!-- Modal -->
-    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -77,6 +90,7 @@ const handlers = {
     chat_messages_tag: null,
     ws: null,
     retry: 0,
+    username_set: new Set(),
 
     init() {
         this.chat_messages_tag = document.querySelector("#chat_messages");
@@ -101,6 +115,12 @@ const handlers = {
     onopen() {
         console.log("웹소켓 서버와 접속");
         this.retry = 0;
+        fetch('{% url "chat:room_users" room.pk %}')
+            .then(response=>response.json())
+            .then(({ username_list}) =>{
+                this.username_set = new Set([...this.username_set,...username_list]);
+                this.update_user_list();
+            });
     },
     onclose(event) {
         const close_code = event.code;
@@ -132,17 +152,26 @@ const handlers = {
         //console.log(event.data)
         const message_json = event.data;
         //console.log("메세지 수신 :", message_json);
+        const { type, message, sender, username } = JSON.parse(message_json);
+        //const message_obj = JSON.parse(message_json);
+        //const {type}=message_obj;
+        //console.log(message_obj)
 
-        const message_obj = JSON.parse(message_json);
-        const {type}=message_obj;
-        console.log(message_obj)
-
+        
         switch(type) {
             case "chat.message":
-                {   
-                    const {message, sender} = message_obj;
-                    this.append_message(message, sender);
-                }
+                this.append_message(message, sender);
+                break;
+            case "chat.user.join":
+                this.append_message(`${username}님이 들어오셨습니다.`);
+                this.username_set.add(username);
+                this.update_user_list();
+                break;
+
+            case "chat.user.leave":
+                this.append_message(`${username}님이 나가셨습니다.`);
+                this.username_set.delete(username);
+                this.update_user_list();
                 break;
             default:
                 console.error(`Invalid message type : ${type}`);
@@ -186,6 +215,12 @@ const handlers = {
             type: "chat.message",
             message: message,
         }))
+    },
+    update_user_list(){
+        const html = [...this.username_set].map(username => `<li>${username}</li>`).join('');
+        document.querySelector("#user_list").innerHTML = html;
+        document.querySelector("#user_count").textContent=`(${this.username_set.size}명)`
+
     },
     modal(message, ok_handler){
         const modal_ele = document.querySelector("#staticBackdrop");

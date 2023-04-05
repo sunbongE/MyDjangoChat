@@ -14,6 +14,7 @@ from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
 
+# 앱에 있는 routing.py를 불러온다.
 import app.routing
 import chat.routing
 
@@ -25,7 +26,7 @@ application = ProtocolTypeRouter(
     {
         "http": django_asgi_app,
         "websocket": AuthMiddlewareStack(  # AuthMiddlewareStack: 쿠키/세션/인증 사용가능설정.
-            URLRouter(
+            URLRouter(  # 불러온 routing.py의 주소들로 접근하면 웹속켓으로 관리한다고 명시한다.
                 app.routing.websocket_urlpatterns + chat.routing.websocket_urlpatterns
             )
         ),
