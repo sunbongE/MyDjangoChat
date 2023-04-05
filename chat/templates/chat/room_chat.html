@@ -154,7 +154,7 @@ const handlers = {
         element.className = "chat-message";//메세지 스타일링 목적
             // css 스타일링을 위해 div로 감싸줌
         let footer = "";
-        if (sender === "{{ user }}"){
+        if (sender === "{{ user.username }}"){
             element.className += ' me';
         }
         else if (sender){
